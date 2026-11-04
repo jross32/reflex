@@ -22,6 +22,7 @@ const os   = require('os');
 const path = require('path');
 const fs   = require('fs');
 const crypto = require('crypto');
+const { buildCloseWindowPs } = require('./lib/window-close');
 
 let SERVER_VERSION = '0.0.0';
 try {
@@ -1551,11 +1552,7 @@ async function closeWindow(args) {
   checkInputAllowed();
   const selector = normalizeWindowSelectorArgs(args);
   await maybeAnnounceAction('close_window', args);
-  const script = `
-${buildWindowResolvePs(selector)}
-$ok = $proc.CloseMainWindow()
-"CloseMainWindow=$ok matchedBy=$matchedBy window='$($proc.MainWindowTitle)'"`;
-  return psRun(script);
+  return psRun(buildCloseWindowPs(selector, buildWindowResolvePs));
 }
 
 function execCommand(cmd, timeoutMs) {
